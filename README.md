@@ -38,7 +38,7 @@ Die Sensorwerte werden auf spezifische Audio-Frequenzen (`sound.freq`) einer C-D
 
 Hier ist ein kurzes Video, das das Verhalten des Roboters in Aktion zeigt:
 
-<video src="./assets/demo_video.mp4" controls="controls" style="max-width: 100%;">
+<video src="./demo_thymio.mp4" controls="controls" style="max-width: 100%;">
   Dein Browser unterstützt das Video-Tag nicht. 
-  <a href="pfad/zum/video.mp4">Lade das Video hier herunter</a>.
+  <a href="./demo_thymio.mp4">Lade das Video hier herunter</a>.
 </video>
