@@ -5,7 +5,15 @@ Der **Thymio II** ist ein mobiler Roboter, der mit einer Vielzahl von Sensoren (
 
 Programmiert wird der Roboter mit **Aseba**, einer ereignisbasierten (event-driven) Skriptsprache, die speziell für Mikrocontroller entwickelt wurde. Aseba führt Codeblöcke reaktiv aus, sobald bestimmte Ereignisse eintreten (z. B. `onevent prox` für Sensor-Updates oder `onevent timer0` für zeitgesteuerte Abläufe). Da Aseba keine Fließkommazahlen (Floats) oder pausierende Befehle (wie `sleep`) unterstützt, erfordert die Programmierung den gezielten Einsatz von Zustandsautomaten (State Machines) und Integer-Mathematik.
 
+
+## Demonstration
+
+Hier ist ein kurzes Video, das das Verhalten des Roboters in Aktion zeigt:
+
+https://github.com/user-attachments/assets/e7c5f8c8-bfc5-43a4-bf72-abcd16310f01
+
 ---
+
 
 ## Projektübersicht & Problemstellungen
 Dieses Repository enthält drei Kernskripte, die verschiedene Konzepte der mobilen Robotik demonstrieren.
@@ -34,11 +42,3 @@ Die Sensorwerte werden auf spezifische Audio-Frequenzen (`sound.freq`) einer C-D
 
 ---
 
-## Demonstration
-
-Hier ist ein kurzes Video, das das Verhalten des Roboters in Aktion zeigt:
-
-<video src="demo_tymio.mp4" controls="controls" style="max-width: 100%;">
-  Dein Browser unterstützt das Video-Tag nicht. 
-  <a href="demo_tymio.mp4">Lade das Video hier herunter</a>.
-</video>
