@@ -18,14 +18,14 @@ https://github.com/user-attachments/assets/e7c5f8c8-bfc5-43a4-bf72-abcd16310f01
 ## Projektübersicht & Problemstellungen
 Dieses Repository enthält drei Kernskripte, die verschiedene Konzepte der mobilen Robotik demonstrieren.
 
-### 1. Kalibrierung und Odometrie (`gerade_fahren.aesl`)
+### 1. Kalibrierung und Odometrie (`ATSP2part1.aesl`)
 **Das Problem:** 
 Der Roboter erhält Befehle für die Motorgeschwindigkeit als abstrakte Zielwerte (`motor.target`), die nicht direkt physikalischen Einheiten entsprechen. Zudem muss die zurückgelegte Strecke (Odometrie) ausschließlich mit Integer-Werten berechnet werden.
 
 **Die Lösung:** 
 Durch manuelle Kalibrierung wurde der lineare Zusammenhang zwischen Zielwert und echter Geschwindigkeit ermittelt. Ein Timer-Event ruft alle 100 ms die tatsächliche Umdrehungsgeschwindigkeit (`motor.speed`) der Räder ab und akkumuliert die gefahrene Distanz in Millimetern.
 
-### 2. Linienverfolgung mit Hindernisvermeidung (`obstacle_avoidance.aesl`)
+### 2. Linienverfolgung mit Hindernisvermeidung (`ATSP2part2.aesl`)
 **Das Problem:** 
 Der Roboter soll auf einer Linie (weißes Papier auf dunklem Grund) zentriert fahren und plötzlichen Hindernissen ausweichen, ohne diese frontal zu rammen. Nach dem Ausweichen muss er das Hindernis umrunden und selbstständig auf die Strecke zurückfinden – eine Herausforderung, da der Thymio keine echten seitlichen Sensoren besitzt.
 
@@ -33,7 +33,7 @@ Der Roboter soll auf einer Linie (weißes Papier auf dunklem Grund) zentriert fa
 *   **P-Regler:** Für das mittige Fahren wird die Differenz der Bodensensoren berechnet und als proportionaler Korrekturwert fließend auf die Motoren angewendet.
 *   **State Machine & Wall-Hugging:** Erkennen die Frontsensoren ein Hindernis, stoppt die Vorwärtsfahrt und der Roboter rotiert auf der Stelle. Ein "Gedächtnis" (`memory`-Variable) speichert, auf welcher Seite das Objekt zuletzt detektiert wurde. Durch kontinuierliches Pendeln in die gespeicherte Richtung tastet der Roboter sich an der Wand des Hindernisses entlang, bis die Bodensensoren die Linie wiedererkennen.
 
-### 3. Thymio als interaktives Instrument (`musik_theremin.aesl`)
+### 3. Thymio als interaktives Instrument (`ATSP2part6.aesl`)
 **Das Problem:** 
 Die horizontalen Infrarotsensoren sollen als kontaktloses Musikinstrument genutzt werden, bei dem jeder Sensor eine andere Note anschlägt.
 
