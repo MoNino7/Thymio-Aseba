@@ -1,0 +1,119 @@
+<!DOCTYPE aesl-source>
+<network>
+
+
+<!--list of global events-->
+<event name="my_accelerations" size="3"/>
+
+
+<!--node Serielles USB-Ger�t-->
+<node nodeId="{40877b8e-3c40-4599-a3f7-c1ce0d19de92}" name="Serielles USB-Ger�t"><![CDATA[# --- Variablen ---
+var state = 0       # 0 = P-Regler Linie, 1 = Auf der Stelle drehen, 2 = Hindernis umfahren
+var threshold = 400 # Schwellenwert (für Rückkehr zur Linie)
+var speed = 150     # Basis-Geschwindigkeit
+var memory = 0      # Gedächtnis: 0 = letztes Signal war links, 1 = rechts
+var error = 0       # Fehlerwert für den P-Regler
+
+onevent prox
+    # ==========================================
+    # PHASE 0: MITTIGE LINIENVERFOLGUNG (P-Regler)
+    # ==========================================
+    if state == 0 then
+        # 1. Frontalen Crash FRÜHZEITIG verhindern (Grenzwert von 2000 auf 1000 gesenkt)
+        if prox.horizontal[1] > 1000 or prox.horizontal[2] > 1000 or prox.horizontal[3] > 1000 then
+            state = 1 # Stoppe Linienverfolgung sofort!
+            
+            # Merken, auf welcher Seite das Hindernis ist, um in die richtige Richtung zu drehen
+            if prox.horizontal[1] > prox.horizontal[3] then
+                memory = 0 # Hindernis ist eher links
+            else
+                memory = 1 # Hindernis ist eher rechts
+            end
+        else
+            # 2. P-Regler für absolut mittiges Fahren auf dem Papier
+            # Verlässt z.B. der linke Sensor das Papier ins Dunkle, wird "error" positiv.
+            error = (prox.ground.delta[1] - prox.ground.delta[0]) / 4
+            
+            # Die Motoren passen ihre Geschwindigkeit fließend der Abweichung an
+            motor.left.target = speed + error
+            motor.right.target = speed - error
+            
+            # Sicherheit: Wenn beide Sensoren das Papier komplett verloren haben
+            if prox.ground.delta[0] < threshold and prox.ground.delta[1] < threshold then
+                 motor.left.target = 0
+                 motor.right.target = 0
+            end
+        end
+
+    # ==========================================
+    # PHASE 1: CRASH-VERMEIDUNG (Auf der Stelle drehen)
+    # ==========================================
+    elseif state == 1 then
+        # Roboter dreht sich auf der Stelle (Räder drehen entgegengesetzt),
+        # KEINE Vorwärtsbewegung mehr, bis die vorderen Sensoren "frei" melden!
+        if memory == 0 then
+            # Hindernis ist links -> Auf der Stelle nach rechts drehen
+            motor.left.target = speed
+            motor.right.target = -speed
+            
+            # Sind die Sensoren vorne und mitte-links frei (< 500)? Dann losfahren!
+            if prox.horizontal[1] < 500 and prox.horizontal[2] < 500 then
+                state = 2
+            end
+        else
+            # Hindernis ist rechts -> Auf der Stelle nach links drehen
+            motor.left.target = -speed
+            motor.right.target = speed
+            
+            # Sind die Sensoren vorne und mitte-rechts frei?
+            if prox.horizontal[2] < 500 and prox.horizontal[3] < 500 then
+                state = 2
+            end
+        end
+
+    # ==========================================
+    # PHASE 2: HINDERNIS UMRUNDEN (mit Gedächtnis)
+    # ==========================================
+    elseif state == 2 then
+        # 3. Abbruchbedingung: Sind wir wieder auf dem weißen Papier?
+        if prox.ground.delta[0] > threshold or prox.ground.delta[1] > threshold then
+            state = 0 # Zurück zur mittigen Linienverfolgung!
+        else
+            # 4. Gedächtnis laufend aktualisieren
+            if prox.horizontal[0] > 400 or prox.horizontal[1] > 400 then
+                memory = 0
+            elseif prox.horizontal[3] > 400 or prox.horizontal[4] > 400 then
+                memory = 1
+            end
+
+            # 5. Wall-Hugging Logik
+            if prox.horizontal[1] > 1500 or prox.horizontal[2] > 1500 or prox.horizontal[3] > 1500 then
+                # ZU NAH: Wir drohen das Objekt mit der Front zu streifen
+                if memory == 0 then
+                    motor.left.target = speed
+                    motor.right.target = 0
+                else
+                    motor.left.target = 0
+                    motor.right.target = speed
+                end
+                
+            elseif prox.horizontal[0] > 300 or prox.horizontal[4] > 300 then
+                # PERFEKTER ABSTAND: Seitensensor sieht die Wand leicht
+                motor.left.target = speed
+                motor.right.target = speed
+                
+            else
+                # OBJEKT VERLOREN: Sensor ins Leere -> Bogen in Richtung des Gedächtnisses
+                if memory == 0 then
+                    motor.left.target = 50      # linkes Rad langsam
+                    motor.right.target = speed  # rechtes Rad schnell
+                else
+                    motor.left.target = speed
+                    motor.right.target = 50
+                end
+            end
+        end
+    end]]></node>
+
+
+</network>

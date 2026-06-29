@@ -1,0 +1,79 @@
+<!DOCTYPE aesl-source>
+<network>
+
+
+<!--list of global events-->
+<event name="my_accelerations" size="3"/>
+
+
+<!--node Serielles USB-Ger�t-->
+<node nodeId="{40877b8e-3c40-4599-a3f7-c1ce0d19de92}" name="Serielles USB-Ger�t"><![CDATA[var threshold = 2000   # Wie nah die Hand sein muss (2000 = ca. 2-3 cm)
+var active_key = -1    # Speichert, welche "Taste" gerade gedrückt wird
+
+onevent prox
+    # --- TASTE 1: Ganz links (C / Rot) ---
+    if prox.horizontal[0] > threshold then
+        if active_key != 0 then
+            call sound.freq(262, 15)  # 15 ist ein kurzer, knackiger Ton
+            call leds.top(32, 0, 0)   # Rot
+            active_key = 0
+        end
+
+    # --- TASTE 2: Mitte-links außen (D / Orange) ---
+    elseif prox.horizontal[1] > threshold then
+        if active_key != 1 then
+            call sound.freq(294, 15) 
+            call leds.top(32, 16, 0)  # Orange
+            active_key = 1
+        end
+
+    # --- TASTE 3: Mitte-links innen (E / Gelb) ---
+    elseif prox.horizontal[2] > threshold then
+        if active_key != 2 then
+            call sound.freq(330, 15) 
+            call leds.top(32, 32, 0)  # Gelb
+            active_key = 2
+        end
+
+    # --- TASTE 4: Genau in der Mitte (F / Grün) ---
+    elseif prox.horizontal[3] > threshold then
+        if active_key != 3 then
+            call sound.freq(349, 15) 
+            call leds.top(0, 32, 0)   # Grün
+            active_key = 3
+        end
+
+    # --- TASTE 5: Mitte-rechts innen (G / Türkis) ---
+    elseif prox.horizontal[4] > threshold then
+        if active_key != 4 then
+            call sound.freq(392, 15) 
+            call leds.top(0, 32, 32)  # Türkis
+            active_key = 4
+        end
+
+    # --- TASTE 6: Mitte-rechts außen (A / Blau) ---
+    elseif prox.horizontal[5] > threshold then
+        if active_key != 5 then
+            call sound.freq(440, 15) 
+            call leds.top(0, 0, 32)   # Blau
+            active_key = 5
+        end
+
+    # --- TASTE 7: Ganz rechts (H / Lila) ---
+    elseif prox.horizontal[6] > threshold then
+        if active_key != 6 then
+            call sound.freq(494, 15) 
+            call leds.top(32, 0, 32)  # Lila
+            active_key = 6
+        end
+
+    # --- KEINE TASTE GEDRÜCKT (Hand ist weg) ---
+    else
+        if active_key != -1 then
+            call leds.top(0, 0, 0)    # Licht aus
+            active_key = -1           # Bereit für den nächsten Anschlag
+        end
+    end]]></node>
+
+
+</network>

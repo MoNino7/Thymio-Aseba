@@ -1,0 +1,80 @@
+<!DOCTYPE aesl-source>
+<network>
+
+
+<!--list of global events-->
+<event name="my_accelerations" size="3"/>
+
+
+<!--node Serielles USB-Ger�t-->
+<node nodeId="{40877b8e-3c40-4599-a3f7-c1ce0d19de92}" name="Serielles USB-Ger�t"><![CDATA[# --- Variablen ---
+var distance_mm = 0      # Gefahrene Strecke in Millimetern
+var speed_target = 100   # Setze hier deine Test-Geschwindigkeit (z.B. 100, 200, 300)
+
+# Timer 0 auf 100 ms einstellen (wird 10x pro Sekunde aufgerufen)
+timer.period[0] = 100
+
+onevent buttons
+# Start: Vorwärts-Taste
+if button.forward == 1 then
+    motor.left.target = speed_target 
+    motor.right.target = speed_target 
+    call leds.top(0, 32, 0) # Grün = Fahrt
+end
+
+# Stopp & Reset: Mittlere Taste
+if button.center == 1 then 
+    motor.left.target = 0 
+    motor.right.target = 0 
+    call leds.top(32, 0, 0) # Rot = Stopp
+    # Wenn du die Distanz bei jedem Stopp nullen willst, entferne das '#' in der nächsten Zeile:
+    # distance_mm = 0
+end
+
+# Rückwärts
+if button.backward == 1 then 
+    motor.left.target = -speed_target 
+    motor.right.target = -speed_target 
+end
+
+# Auf der Stelle drehen
+if button.left == 1 then 
+    motor.left.target = -speed_target 
+    motor.right.target = speed_target 
+end
+
+if button.right == 1 then 
+    motor.left.target = speed_target 
+    motor.right.target = -speed_target
+end
+
+# Sicherheit: Stopp bei Tischkante / schwarzer Linie
+onevent prox
+if prox.ground.delta[0] < 300 or prox.ground.delta[1] < 300 then 
+    motor.left.target = 0 
+    motor.right.target = 0 
+    call leds.top(32, 0, 0)
+end
+
+# --- Automatische Streckenberechnung (Odometrie) ---
+onevent timer0
+# Wir berechnen die Strecke nur, wenn der Roboter vorwärts fährt
+if motor.left.target > 0 then
+    # Theorie: 1 Speed-Einheit = 0,4 mm/s
+    # In 100ms (0,1s) fährt der Roboter also: Speed * 0,04 mm.
+    # Da Aseba keine Kommazahlen kann, rechnen wir: (Speed * 4) / 100
+    # Wir nehmen den Durchschnitt beider Räder: (Left + Right) / 2
+    # Zusammengefasst ergibt das den Faktor 2:
+    distance_mm = distance_mm + ((motor.left.speed + motor.right.speed) * 2) / 100
+end
+
+#wir haben 68cm und er gibt an dass es 72cm sein, 4 cm unterschied
+#68cm in 4,7s bei 1500 
+#bei 500 bei 4,95s
+#250 in 9s
+#bei 100 21s
+#Der Zusammenhang ist nahezu linear. Eine Einheit im Aseba-Code entspricht bei eurem Roboter auf eurem Untergrund ungefähr $0,3 \text{ mm/s}$.
+#Der theoretische Wert laut Hersteller ist oft $0,4 \text{ mm/s}$, aber durch das Gewicht des Roboters, die Reibung des Bodens (z. B. Teppich vs. glatter Tisch) und den Akkustand ist der Wert bei euch in der Realität etwas niedriger.]]></node>
+
+
+</network>
